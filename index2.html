@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manipulación de Archivos con JavaScript</title>
+</head>
+<body>
+  <input type="file" id="fileInput" />
+  <form id="dataForm">
+    <input type="text" id="dataInput" placeholder="Ingrese un dato" />
+    <button type="submit">Agregar al arreglo</button>
+  </form>
+  <button id="saveButton">Guardar</button>
+
+  <script>
+    // Función para manejar la carga del archivo
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const text = e.target.result;
+        console.log('Contenido del archivo:', text);
+        // Aquí puedes manipular el contenido del archivo (text) como desees
+      };
+      
+      reader.readAsText(file);
+    });
+
+    // Arreglo para agregar al archivo
+    let existingArray = [];
+
+    // Función para manejar el envío del formulario
+    document.getElementById('dataForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const newData = document.getElementById('dataInput').value;
+      existingArray.push(newData);
+      document.getElementById('dataInput').value = '';
+    });
+
+    // Función para guardar el contenido modificado en el archivo
+    document.getElementById('saveButton').addEventListener('click', function() {
+      const fileContent = `var existingArray = ${JSON.stringify(existingArray)};`;
+
+      const blob = new Blob([fileContent], { type: 'text/javascript' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'archivo.js';
+      document.body.appendChild(a);
+      a.click();
+
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 0);
+    });
+  </script>
+</body>
+</html>
